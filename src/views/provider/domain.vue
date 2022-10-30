@@ -159,7 +159,11 @@ export default {
 
       providerConfig: {},
       domains:[],
-      domainForm:{},
+      domainForm:{
+        nameServer0:"hugh.ns.cloudflare.com",
+        nameServer1:"nina.ns.cloudflare.com",
+        domain:"",
+      },
       //
       types: [],
       providers: [],
@@ -257,15 +261,13 @@ export default {
       return readable;
     },
     showEditDomainDialog(row) {
-      this.domainForm = row;
-      this.domainForm.nameServer0 = "hugh.ns.cloudflare.com";
-      this.domainForm.nameServer1 = "nina.ns.cloudflare.com";
-      if (row.nameServers !== undefined && Array.isArray(this.domainForm) && this.domainForm.length > 0) {
-          if (this.domainForm.length == 1) {
-              this.domainForm.nameServer0 = this.domainForm.nameServers[0];
+      this.domainForm.domain = row.domain;
+      if (row.nameServers !== undefined && Array.isArray(row.nameServers) && row.nameServers.length > 0) {
+          if (row.nameServers.length == 1) {
+              this.domainForm.nameServer0 = row.nameServers[0];
           }
-          if (this.domainForm.length == 2) {
-              this.domainForm.nameServer1 = this.domainForm.nameServers[1];
+          if (row.nameServers.length == 2) {
+              this.domainForm.nameServer1 = row.nameServers[1];
           }
       }
       this.dialogVisibleEditDialog = true;
@@ -290,6 +292,10 @@ export default {
           nameServers: nameServers,
         };
         editGodaddyDomain(this.providerConfig.id, this.domainForm.domain, patchData).then((response) => {
+          if (response.data.code != 0) {
+            this.$message.error(response.data.msg);
+            return
+          }
           this.$message({
             message: "Success",
             type: "success",
